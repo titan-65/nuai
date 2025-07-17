@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "composite": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "declarationMap": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
+  },
+  "references": [
+    { "path": "./packages/@ai-nuxt/core" },
+    { "path": "./packages/@ai-nuxt/module" },
+    { "path": "./packages/@ai-nuxt/ui" },
+    { "path": "./packages/@ai-nuxt/devtools" },
+    { "path": "./packages/@ai-nuxt/cli" }
+  ]
+}

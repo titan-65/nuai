@@ -1,0 +1,37 @@
+{
+  "name": "ai-nuxt-framework",
+  "version": "0.1.0",
+  "description": "A comprehensive AI framework built on top of Nuxt.js",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@8.15.0",
+  "scripts": {
+    "build": "pnpm -r build",
+    "dev": "pnpm -r dev",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "pnpm -r typecheck",
+    "clean": "pnpm -r clean",
+    "release": "pnpm build && changeset publish"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "@changesets/cli": "^2.27.1",
+    "@nuxt/eslint-config": "^0.2.0",
+    "@types/node": "^20.11.0",
+    "@vitest/ui": "^1.2.0",
+    "eslint": "^8.56.0",
+    "prettier": "^3.2.0",
+    "typescript": "^5.3.0",
+    "unbuild": "^2.0.0",
+    "vitest": "^1.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  }
+}
