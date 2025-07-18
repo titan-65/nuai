@@ -232,6 +232,10 @@ export default defineNuxtModule<AINuxtModuleOptions>({
       {
         name: 'useAIChatStore',
         from: resolver.resolve('./runtime/composables/useAIChatStore')
+      },
+      {
+        name: 'useAICache',
+        from: resolver.resolve('./runtime/composables/useAICache')
       }
     ])
     
