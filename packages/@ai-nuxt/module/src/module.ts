@@ -103,6 +103,9 @@ export default defineNuxtModule<AINuxtModuleOptions>({
     // Add plugin for server-side initialization
     addPlugin(resolver.resolve('./runtime/plugin.server'))
     
+    // Add Pinia plugin for state management
+    addPlugin(resolver.resolve('./runtime/plugins/pinia.client'))
+    
     // Add middleware for AI routes
     if (moduleOptions.security?.rateLimit?.enabled) {
       addServerHandler({
@@ -221,6 +224,14 @@ export default defineNuxtModule<AINuxtModuleOptions>({
       {
         name: 'useAISocket',
         from: resolver.resolve('./runtime/composables/useAISocket')
+      },
+      {
+        name: 'useAIStore',
+        from: resolver.resolve('./runtime/composables/useAIStore')
+      },
+      {
+        name: 'useAIChatStore',
+        from: resolver.resolve('./runtime/composables/useAIChatStore')
       }
     ])
     

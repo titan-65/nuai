@@ -105,7 +105,7 @@
   - Write component tests for selector and debugger functionality
   - _Requirements: 3.1, 3.3, 8.2, 8.5_
 
-- [ ] 16. Implement Pinia store integration for state management
+- [x] 16. Implement Pinia store integration for state management
   - Create AI store with conversation management and settings
   - Add conversation persistence to localStorage
   - Implement active conversation switching and management
