@@ -265,6 +265,14 @@ export {}
       `
     })
     
+    // Add components directory for auto-registration
+    nuxt.hook('components:dirs', (dirs) => {
+      dirs.push({
+        path: resolver.resolve('./runtime/components'),
+        prefix: 'AI'
+      })
+    })
+    
     // Add CSS for components (if needed)
     if (nuxt.options.css) {
       nuxt.options.css.push(resolver.resolve('./runtime/assets/ai-nuxt.css'))
