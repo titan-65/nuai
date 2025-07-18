@@ -63,14 +63,14 @@
   - Write tests for streaming functionality and error handling
   - _Requirements: 2.1, 2.2, 2.4, 2.5_
 
-- [ ] 10. Create server API routes for AI operations
+- [x] 10. Create server API routes for AI operations
   - Implement /api/ai/chat.post.ts route for chat completions
   - Add /api/ai/stream.post.ts route for streaming responses
   - Create /api/ai/embedding.post.ts route for embedding generation
   - Add proper error handling and request validation
   - _Requirements: 1.1, 2.1, 2.2_
 
-- [ ] 11. Implement WebSocket support for bidirectional streaming
+- [x] 11. Implement WebSocket support for bidirectional streaming
   - Create WebSocket server handler for real-time communication
   - Implement useAISocket composable with connection management
   - Add automatic reconnection logic with exponential backoff

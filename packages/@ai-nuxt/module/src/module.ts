@@ -35,7 +35,12 @@ export default defineNuxtModule<AINuxtModuleOptions>({
     security: {
       promptInjectionDetection: false,
       piiScrubbing: false,
-      contentFiltering: false
+      contentFiltering: false,
+      rateLimit: {
+        enabled: false,
+        maxRequests: 60,
+        windowMs: 60000
+      }
     },
     debug: false
   },
@@ -64,7 +69,12 @@ export default defineNuxtModule<AINuxtModuleOptions>({
       security: {
         promptInjectionDetection: false,
         piiScrubbing: false,
-        contentFiltering: false
+        contentFiltering: false,
+        rateLimit: {
+          enabled: false,
+          maxRequests: 60,
+          windowMs: 60000
+        }
       },
       debug: false
     }) as ModuleOptions
@@ -93,7 +103,61 @@ export default defineNuxtModule<AINuxtModuleOptions>({
     // Add plugin for server-side initialization
     addPlugin(resolver.resolve('./runtime/plugin.server'))
     
+    // Add middleware for AI routes
+    if (moduleOptions.security?.rateLimit?.enabled) {
+      addServerHandler({
+        route: '/api/ai/**',
+        handler: resolver.resolve('./runtime/server/middleware/rate-limit'),
+        middleware: true
+      })
+    }
+    
+    if (moduleOptions.caching?.enabled) {
+      addServerHandler({
+        route: '/api/ai/**',
+        handler: resolver.resolve('./runtime/server/middleware/cache'),
+        middleware: true
+      })
+    }
+    
+    if (moduleOptions.debug) {
+      addServerHandler({
+        route: '/api/ai/**',
+        handler: resolver.resolve('./runtime/server/middleware/logger'),
+        middleware: true
+      })
+    }
+    
+    if (moduleOptions.security && (
+      moduleOptions.security.promptInjectionDetection ||
+      moduleOptions.security.piiScrubbing ||
+      moduleOptions.security.contentFiltering
+    )) {
+      addServerHandler({
+        route: '/api/ai/**',
+        handler: resolver.resolve('./runtime/server/middleware/security'),
+        middleware: true
+      })
+    }
+    
+    // Add authentication middleware
+    addServerHandler({
+      route: '/api/ai/**',
+      handler: resolver.resolve('./runtime/server/middleware/ai-auth'),
+      middleware: true
+    })
+    
     // Add server handlers for AI API routes
+    addServerHandler({
+      route: '/api/ai/health',
+      handler: resolver.resolve('./runtime/server/api/health.get')
+    })
+    
+    addServerHandler({
+      route: '/api/ai/providers',
+      handler: resolver.resolve('./runtime/server/api/providers.get')
+    })
+    
     addServerHandler({
       route: '/api/ai/chat',
       handler: resolver.resolve('./runtime/server/api/chat.post')
@@ -114,6 +178,14 @@ export default defineNuxtModule<AINuxtModuleOptions>({
         route: '/api/ai/stream',
         handler: resolver.resolve('./runtime/server/api/stream.post')
       })
+      
+      // Add WebSocket handler for bidirectional streaming
+      if (moduleOptions.streaming.transport === 'websocket' || moduleOptions.streaming.transport === 'sse') {
+        addServerHandler({
+          route: '/api/ai/ws',
+          handler: resolver.resolve('./runtime/server/api/ws')
+        })
+      }
     }
     
     // Add composables auto-imports
@@ -145,6 +217,10 @@ export default defineNuxtModule<AINuxtModuleOptions>({
       {
         name: 'useAIProvider',
         from: resolver.resolve('./runtime/composables/useAIProvider')
+      },
+      {
+        name: 'useAISocket',
+        from: resolver.resolve('./runtime/composables/useAISocket')
       }
     ])
     
