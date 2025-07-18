@@ -1,0 +1,129 @@
+/* AI Nuxt Module Styles */
+
+.ai-nuxt-loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.ai-nuxt-error {
+  color: #ef4444;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 0.375rem;
+  padding: 0.75rem;
+  margin: 0.5rem 0;
+}
+
+.ai-nuxt-success {
+  color: #059669;
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 0.375rem;
+  padding: 0.75rem;
+  margin: 0.5rem 0;
+}
+
+.ai-nuxt-message {
+  margin: 0.5rem 0;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+}
+
+.ai-nuxt-message--user {
+  background-color: #dbeafe;
+  margin-left: 2rem;
+  text-align: right;
+}
+
+.ai-nuxt-message--assistant {
+  background-color: #f3f4f6;
+  margin-right: 2rem;
+}
+
+.ai-nuxt-message--system {
+  background-color: #fef3c7;
+  font-style: italic;
+  font-size: 0.875rem;
+}
+
+.ai-nuxt-streaming {
+  position: relative;
+}
+
+.ai-nuxt-streaming::after {
+  content: '▋';
+  animation: ai-nuxt-blink 1s infinite;
+  color: #6b7280;
+}
+
+@keyframes ai-nuxt-blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.ai-nuxt-token-usage {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+.ai-nuxt-provider-badge {
+  display: inline-block;
+  background-color: #e5e7eb;
+  color: #374151;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.ai-nuxt-debug {
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  padding: 0.75rem;
+  font-family: monospace;
+  font-size: 0.875rem;
+  margin: 0.5rem 0;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .ai-nuxt-error {
+    color: #fca5a5;
+    background-color: #450a0a;
+    border-color: #991b1b;
+  }
+  
+  .ai-nuxt-success {
+    color: #6ee7b7;
+    background-color: #064e3b;
+    border-color: #047857;
+  }
+  
+  .ai-nuxt-message--user {
+    background-color: #1e3a8a;
+    color: #dbeafe;
+  }
+  
+  .ai-nuxt-message--assistant {
+    background-color: #374151;
+    color: #f9fafb;
+  }
+  
+  .ai-nuxt-message--system {
+    background-color: #451a03;
+    color: #fbbf24;
+  }
+  
+  .ai-nuxt-provider-badge {
+    background-color: #4b5563;
+    color: #f3f4f6;
+  }
+  
+  .ai-nuxt-debug {
+    background-color: #111827;
+    border-color: #374151;
+    color: #d1d5db;
+  }
+}

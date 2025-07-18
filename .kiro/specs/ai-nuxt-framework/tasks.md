@@ -12,7 +12,7 @@
   - Implement provider registry system for managing multiple AI providers
   - Create provider configuration types and validation schemas
   - Write unit tests for provider abstraction layer
-  - _Requirements: 1.1, 1.3, 1.5_
+  - _Requirements: `1.1, 1.3, 1.5_
 
 - [x] 3. Build OpenAI provider implementation
   - Implement OpenAIProvider class with chat, completion, and embedding support
@@ -35,7 +35,7 @@
   - Create unit tests for Ollama provider functionality
   - _Requirements: 1.1, 1.3, 1.5, 2.1_
 
-- [ ] 6. Create core Nuxt module with auto-imports
+- [x] 6. Create core Nuxt module with auto-imports
   - Implement main Nuxt module with configuration options
   - Set up auto-imports for useAI, useAIChat, useAICompletion composables
   - Configure runtime config integration for API keys and settings
