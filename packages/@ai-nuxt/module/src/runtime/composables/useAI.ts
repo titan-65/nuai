@@ -2,6 +2,7 @@ import { ref, computed, reactive } from 'vue'
 import { useRuntimeConfig, useNuxtApp } from '#app'
 import { getProvider, getDefaultProvider } from '@ai-nuxt/core'
 import type { ChatOptions, CompletionOptions, EmbeddingOptions, ChatResponse, CompletionResponse, EmbeddingResponse } from '@ai-nuxt/core'
+import { useAICache } from './useAICache'
 
 export interface UseAIOptions {
   provider?: string
@@ -50,25 +51,71 @@ export function useAI(options: UseAIOptions = {}) {
     provider: state.currentProvider
   }))
   
-  // Internal cache for responses (simple in-memory cache)
-  const responseCache = new Map<string, { data: any; timestamp: number; ttl: number }>()
+  // Advanced caching with semantic similarity
+  const aiCache = useAICache()
   
-  // Helper functions
-  const createCacheKey = (method: string, options: any): string => {
-    return `${method}:${state.currentProvider}:${JSON.stringify(options)}`
-  }
-  
-  const getCachedResponse = (key: string) => {
-    const cached = responseCache.get(key)
-    if (cached && Date.now() - cached.timestamp < cached.ttl) {
-      return cached.data
+  // Initialize semantic caching if enabled
+  if (aiConfig.caching?.semantic?.enabled) {
+    // Create embedding function for semantic caching
+    const generateEmbedding = async (text: string): Promise<number[]> => {
+      try {
+        const response = await $fetch<EmbeddingResponse>('/api/ai/embedding', {
+          method: 'POST',
+          body: {
+            input: text,
+            provider: aiConfig.caching.semantic.embeddingProvider || state.currentProvider,
+            model: aiConfig.caching.semantic.embeddingModel || 'text-embedding-3-small'
+          }
+        })
+        return response.data[0].embedding
+      } catch (error) {
+        console.warn('Failed to generate embedding for semantic cache:', error)
+        throw error
+      }
     }
-    responseCache.delete(key)
-    return null
-  }
-  
-  const setCachedResponse = (key: string, data: any, ttl: number = 300000) => { // 5 minutes default
-    responseCache.set(key, { data, timestamp: Date.now(), ttl })
+    
+    // Initialize cache with semantic similarity
+    aiCache.initializeCache({
+      enabled: true,
+      layers: {
+        memory: {
+          enabled: true,
+          maxSize: aiConfig.caching.maxSize || 100,
+          ttl: (aiConfig.caching.ttl || 300) * 1000
+        },
+        semantic: {
+          enabled: true,
+          threshold: aiConfig.caching.semantic.threshold || 0.95,
+          maxSize: aiConfig.caching.semantic.maxSize || 50,
+          ttl: (aiConfig.caching.semantic.ttl || 600) * 1000
+        }
+      },
+      keyGeneration: {
+        includeModel: true,
+        includeProvider: true,
+        includeTemperature: true,
+        includeMaxTokens: false,
+        normalizeWhitespace: true
+      }
+    }, generateEmbedding)
+  } else {
+    // Initialize basic memory cache
+    aiCache.initializeCache({
+      enabled: aiConfig.caching?.enabled !== false,
+      layers: {
+        memory: {
+          enabled: true,
+          maxSize: aiConfig.caching?.maxSize || 100,
+          ttl: (aiConfig.caching?.ttl || 300) * 1000
+        },
+        semantic: {
+          enabled: false,
+          threshold: 0.95,
+          maxSize: 50,
+          ttl: 600000
+        }
+      }
+    })
   }
   
   const handleError = (error: any, context: string): AIError => {
@@ -128,16 +175,19 @@ export function useAI(options: UseAIOptions = {}) {
   const createClientInterface = () => ({
     chat: {
       create: async (chatOptions: ChatOptions): Promise<ChatResponse> => {
-        const cacheKey = options.caching !== false ? createCacheKey('chat', chatOptions) : null
-        
-        // Check cache first
-        if (cacheKey && aiConfig.caching.enabled) {
-          const cached = getCachedResponse(cacheKey)
-          if (cached) {
+        // Check semantic cache first
+        if (options.caching !== false && aiCache.isEnabled.value) {
+          const cachedResponse = await aiCache.getCachedChatResponse(chatOptions)
+          if (cachedResponse) {
             if (aiConfig.debug) {
-              console.log('🎯 Cache hit for chat request')
+              console.log('🎯 Semantic cache hit for chat request', {
+                similarity: cachedResponse.metadata.cacheHit ? 'exact' : 'semantic',
+                provider: cachedResponse.metadata.provider,
+                model: cachedResponse.metadata.model
+              })
             }
-            return cached
+            updateStats(cachedResponse.response)
+            return cachedResponse.response
           }
         }
         
@@ -161,9 +211,14 @@ export function useAI(options: UseAIOptions = {}) {
           
           updateStats(response)
           
-          // Cache successful response
-          if (cacheKey && aiConfig.caching.enabled) {
-            setCachedResponse(cacheKey, response, aiConfig.caching.ttl * 1000)
+          // Cache successful response with semantic similarity
+          if (options.caching !== false && aiCache.isEnabled.value) {
+            await aiCache.setCachedChatResponse(chatOptions, response, {
+              provider: state.currentProvider,
+              model: options.model || chatOptions.model || 'default',
+              tokens: response.usage?.totalTokens,
+              cost: response.cost
+            })
           }
           
           return response
@@ -247,16 +302,19 @@ export function useAI(options: UseAIOptions = {}) {
     
     completion: {
       create: async (completionOptions: CompletionOptions): Promise<CompletionResponse> => {
-        const cacheKey = options.caching !== false ? createCacheKey('completion', completionOptions) : null
-        
-        // Check cache first
-        if (cacheKey && aiConfig.caching.enabled) {
-          const cached = getCachedResponse(cacheKey)
-          if (cached) {
+        // Check semantic cache first
+        if (options.caching !== false && aiCache.isEnabled.value) {
+          const cachedResponse = await aiCache.getCachedCompletionResponse(completionOptions)
+          if (cachedResponse) {
             if (aiConfig.debug) {
-              console.log('🎯 Cache hit for completion request')
+              console.log('🎯 Semantic cache hit for completion request', {
+                similarity: cachedResponse.metadata.cacheHit ? 'exact' : 'semantic',
+                provider: cachedResponse.metadata.provider,
+                model: cachedResponse.metadata.model
+              })
             }
-            return cached
+            updateStats(cachedResponse.response)
+            return cachedResponse.response
           }
         }
         
@@ -280,9 +338,14 @@ export function useAI(options: UseAIOptions = {}) {
           
           updateStats(response)
           
-          // Cache successful response
-          if (cacheKey && aiConfig.caching.enabled) {
-            setCachedResponse(cacheKey, response, aiConfig.caching.ttl * 1000)
+          // Cache successful response with semantic similarity
+          if (options.caching !== false && aiCache.isEnabled.value) {
+            await aiCache.setCachedCompletionResponse(completionOptions, response, {
+              provider: state.currentProvider,
+              model: options.model || completionOptions.model || 'default',
+              tokens: response.usage?.totalTokens,
+              cost: response.cost
+            })
           }
           
           return response
@@ -366,16 +429,19 @@ export function useAI(options: UseAIOptions = {}) {
     
     embedding: {
       create: async (embeddingOptions: EmbeddingOptions): Promise<EmbeddingResponse> => {
-        const cacheKey = options.caching !== false ? createCacheKey('embedding', embeddingOptions) : null
-        
-        // Check cache first
-        if (cacheKey && aiConfig.caching.enabled) {
-          const cached = getCachedResponse(cacheKey)
-          if (cached) {
+        // Check semantic cache first
+        if (options.caching !== false && aiCache.isEnabled.value) {
+          const cachedResponse = await aiCache.getCachedEmbeddingResponse(embeddingOptions)
+          if (cachedResponse) {
             if (aiConfig.debug) {
-              console.log('🎯 Cache hit for embedding request')
+              console.log('🎯 Semantic cache hit for embedding request', {
+                similarity: cachedResponse.metadata.cacheHit ? 'exact' : 'semantic',
+                provider: cachedResponse.metadata.provider,
+                model: cachedResponse.metadata.model
+              })
             }
-            return cached
+            updateStats(cachedResponse.response)
+            return cachedResponse.response
           }
         }
         
@@ -397,9 +463,14 @@ export function useAI(options: UseAIOptions = {}) {
           
           updateStats(response)
           
-          // Cache successful response
-          if (cacheKey && aiConfig.caching.enabled) {
-            setCachedResponse(cacheKey, response, aiConfig.caching.ttl * 1000)
+          // Cache successful response with semantic similarity
+          if (options.caching !== false && aiCache.isEnabled.value) {
+            await aiCache.setCachedEmbeddingResponse(embeddingOptions, response, {
+              provider: state.currentProvider,
+              model: options.model || embeddingOptions.model || 'default',
+              tokens: response.usage?.totalTokens,
+              cost: response.cost
+            })
           }
           
           return response
@@ -456,8 +527,8 @@ export function useAI(options: UseAIOptions = {}) {
     }
   }
   
-  const clearCache = () => {
-    responseCache.clear()
+  const clearCache = async () => {
+    await aiCache.clearCache()
     if (aiConfig.debug) {
       console.log('🗑️ AI response cache cleared')
     }

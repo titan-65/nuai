@@ -5,6 +5,7 @@
 
 import { Cache, CacheFactory, CacheOptions, CacheStats } from './cache'
 import { ChatOptions, CompletionOptions, EmbeddingOptions } from './types'
+import { SemanticSimilarityCalculator, SemanticSimilarityFactory } from './semantic-similarity'
 
 export interface CacheConfig {
   enabled: boolean
