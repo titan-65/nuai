@@ -139,6 +139,10 @@ export default defineNuxtModule<AINuxtModuleOptions>({
         from: resolver.resolve('./runtime/composables/useAIStream')
       },
       {
+        name: 'useAIStreamingChat',
+        from: resolver.resolve('./runtime/composables/useAIStreamingChat')
+      },
+      {
         name: 'useAIProvider',
         from: resolver.resolve('./runtime/composables/useAIProvider')
       }
