@@ -147,14 +147,14 @@
   - Write tests for RAG functionality and context injection
   - _Requirements: 6.3, 6.5_
 
-- [ ] 22. Create agent system foundation
+- [x] 22. Create agent system foundation
   - Implement AIAgent interface with role, capabilities, and tools
   - Create agent registry and management system
   - Add agent execution context and isolation
   - Write tests for agent creation and basic execution
   - _Requirements: 7.1, 7.2, 7.4_
 
-- [ ] 23. Implement agent tool system
+- [x] 23. Implement agent tool system
   - Create AITool interface with parameter validation
   - Implement tool execution and result handling
   - Add built-in tools for common operations (web search, file operations)
