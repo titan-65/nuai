@@ -84,21 +84,21 @@
   - Create component tests with Vue Testing Library
   - _Requirements: 3.1, 3.2, 3.4_
 
-- [ ] 13. Build AIMessageList and AIInput components
+- [x] 13. Build AIMessageList and AIInput components
   - Create AIMessageList component for displaying conversation messages
   - Implement AIInput component with submit handling and validation
   - Add message formatting, timestamps, and user/assistant styling
   - Write component tests for message display and input functionality
   - _Requirements: 3.1, 3.2, 3.4_
 
-- [ ] 14. Create AIPromptBuilder component
+- [x] 14. Create AIPromptBuilder component
   - Implement visual prompt construction interface
   - Add template system for common prompt patterns
   - Create drag-and-drop interface for prompt elements
   - Write tests for prompt builder functionality
   - _Requirements: 3.1, 3.3_
 
-- [ ] 15. Build AIModelSelector and AIDebugger components
+- [x] 15. Build AIModelSelector and AIDebugger components
   - Create AIModelSelector for switching between providers and models
   - Implement AIDebugger component showing token usage and performance metrics
   - Add real-time debugging information display
