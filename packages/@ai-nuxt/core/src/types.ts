@@ -144,6 +144,11 @@ export interface ModuleOptions {
     promptInjectionDetection: boolean
     piiScrubbing: boolean
     contentFiltering: boolean
+    rateLimit?: {
+      enabled: boolean
+      maxRequests: number
+      windowMs: number
+    }
   }
   debug: boolean
 }

@@ -14,6 +14,8 @@
     "lint:fix": "eslint . --fix",
     "typecheck": "pnpm -r typecheck",
     "clean": "pnpm -r clean",
+    "bundle-size": "node scripts/bundle-size-check.js",
+    "build:check": "pnpm build && pnpm bundle-size",
     "release": "pnpm build && changeset publish"
   },
   "workspaces": [

@@ -1,38 +1,84 @@
 {
   "name": "@ai-nuxt/cli",
   "version": "0.1.0",
-  "description": "CLI tools for AI Nuxt framework",
+  "description": "AI Nuxt CLI - Command-line AI workflow tool for Nuxt.js developers",
   "type": "module",
   "bin": {
-    "ai-nuxt": "./dist/cli.mjs"
+    "ai-nuxt": "./dist/cli.js",
+    "ainuxt": "./dist/cli.js"
   },
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.cjs"
     }
   },
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "templates"
   ],
   "scripts": {
     "build": "unbuild",
     "dev": "unbuild --stub",
-    "typecheck": "tsc --noEmit",
-    "clean": "rm -rf dist"
+    "prepublishOnly": "pnpm build",
+    "test": "vitest"
   },
   "dependencies": {
     "@ai-nuxt/core": "workspace:*",
-    "citty": "^0.1.5",
-    "consola": "^3.2.3",
-    "pathe": "^1.1.2"
+    "commander": "^11.1.0",
+    "inquirer": "^9.2.12",
+    "chalk": "^5.3.0",
+    "ora": "^7.0.1",
+    "boxen": "^7.1.1",
+    "figlet": "^1.7.0",
+    "gradient-string": "^2.0.2",
+    "node-fetch": "^3.3.2",
+    "fs-extra": "^11.1.1",
+    "yaml": "^2.3.4",
+    "semver": "^7.5.4",
+    "update-notifier": "^7.0.0",
+    "open": "^9.1.0",
+    "clipboardy": "^4.0.0",
+    "terminal-link": "^3.0.0",
+    "strip-ansi": "^7.1.0",
+    "wrap-ansi": "^9.0.0"
   },
   "devDependencies": {
-    "typescript": "^5.3.0",
-    "unbuild": "^2.0.0"
-  }
+    "unbuild": "^2.0.0",
+    "typescript": "^5.2.0",
+    "vitest": "^1.0.0",
+    "@types/inquirer": "^9.0.7",
+    "@types/figlet": "^1.5.8",
+    "@types/fs-extra": "^11.0.4",
+    "@types/semver": "^7.5.6"
+  },
+  "peerDependencies": {
+    "nuxt": "^3.8.0"
+  },
+  "keywords": [
+    "ai",
+    "nuxt",
+    "cli",
+    "artificial-intelligence",
+    "openai",
+    "anthropic",
+    "ollama",
+    "chatgpt",
+    "claude",
+    "developer-tools"
+  ],
+  "author": "AI Nuxt Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ai-nuxt/ai-nuxt"
+  },
+  "bugs": {
+    "url": "https://github.com/ai-nuxt/ai-nuxt/issues"
+  },
+  "homepage": "https://ai-nuxt.com"
 }

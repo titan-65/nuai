@@ -27,7 +27,8 @@
     "@ai-nuxt/core": "workspace:*",
     "@nuxt/kit": "^3.9.0",
     "defu": "^6.1.4",
-    "pathe": "^1.1.2"
+    "pathe": "^1.1.2",
+    "pinia": "^2.1.7"
   },
   "devDependencies": {
     "@nuxt/schema": "^3.9.0",
