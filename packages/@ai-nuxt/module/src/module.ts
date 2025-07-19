@@ -76,7 +76,18 @@ export default defineNuxtModule<AINuxtModuleOptions>({
           windowMs: 60000
         }
       },
-      debug: false
+      debug: false,
+      monitoring: {
+        enabled: true,
+        serviceName: 'ai-nuxt-app',
+        serviceVersion: '1.0.0',
+        enableMetrics: true,
+        enableTracing: true,
+        enableAlerts: true,
+        sampleRate: 1.0,
+        enableAutoInstrumentation: true,
+        alertCheckInterval: 60000
+      }
     }) as ModuleOptions
     
     // Add runtime config
@@ -105,6 +116,16 @@ export default defineNuxtModule<AINuxtModuleOptions>({
     
     // Add Pinia plugin for state management
     addPlugin(resolver.resolve('./runtime/plugins/pinia.client'))
+    
+    // Add monitoring plugin for client-side
+    if (moduleOptions.monitoring?.enabled !== false) {
+      addPlugin(resolver.resolve('./runtime/plugins/monitoring.client'))
+    }
+    
+    // Add performance monitoring plugin in development
+    if (nuxt.options.dev || moduleOptions.debug) {
+      addPlugin(resolver.resolve('./runtime/plugins/performance.client'))
+    }
     
     // Add middleware for AI routes
     if (moduleOptions.security?.rateLimit?.enabled) {
@@ -143,6 +164,15 @@ export default defineNuxtModule<AINuxtModuleOptions>({
       })
     }
     
+    // Add monitoring middleware
+    if (moduleOptions.monitoring?.enabled !== false) {
+      addServerHandler({
+        route: '/**',
+        handler: resolver.resolve('./runtime/server/middleware/monitoring'),
+        middleware: true
+      })
+    }
+    
     // Add authentication middleware
     addServerHandler({
       route: '/api/ai/**',
@@ -176,6 +206,19 @@ export default defineNuxtModule<AINuxtModuleOptions>({
       handler: resolver.resolve('./runtime/server/api/embedding.post')
     })
     
+    // Add monitoring API routes
+    if (moduleOptions.monitoring?.enabled !== false) {
+      addServerHandler({
+        route: '/api/monitoring/health',
+        handler: resolver.resolve('./runtime/server/api/monitoring/health.get')
+      })
+      
+      addServerHandler({
+        route: '/api/monitoring/metrics',
+        handler: resolver.resolve('./runtime/server/api/monitoring/metrics.get')
+      })
+    }
+    
     if (moduleOptions.streaming.enabled) {
       addServerHandler({
         route: '/api/ai/stream',
@@ -191,8 +234,8 @@ export default defineNuxtModule<AINuxtModuleOptions>({
       }
     }
     
-    // Add composables auto-imports
-    addImports([
+    // Add core composables auto-imports (always available)
+    const coreImports = [
       {
         name: 'useAI',
         from: resolver.resolve('./runtime/composables/useAI')
@@ -204,27 +247,53 @@ export default defineNuxtModule<AINuxtModuleOptions>({
       {
         name: 'useAICompletion',
         from: resolver.resolve('./runtime/composables/useAICompletion')
-      },
-      {
-        name: 'useAIEmbedding',
-        from: resolver.resolve('./runtime/composables/useAIEmbedding')
-      },
-      {
-        name: 'useAIStream',
-        from: resolver.resolve('./runtime/composables/useAIStream')
-      },
-      {
-        name: 'useAIStreamingChat',
-        from: resolver.resolve('./runtime/composables/useAIStreamingChat')
-      },
-      {
-        name: 'useAIProvider',
-        from: resolver.resolve('./runtime/composables/useAIProvider')
-      },
-      {
-        name: 'useAISocket',
-        from: resolver.resolve('./runtime/composables/useAISocket')
-      },
+      }
+    ]
+    
+    // Add optional composables based on configuration
+    const optionalImports = []
+    
+    if (moduleOptions.streaming?.enabled) {
+      optionalImports.push(
+        {
+          name: 'useAIStream',
+          from: resolver.resolve('./runtime/composables/useAIStream')
+        },
+        {
+          name: 'useAIStreamingChat',
+          from: resolver.resolve('./runtime/composables/useAIStreamingChat')
+        }
+      )
+      
+      if (moduleOptions.streaming.transport === 'websocket') {
+        optionalImports.push({
+          name: 'useAISocket',
+          from: resolver.resolve('./runtime/composables/useAISocket')
+        })
+      }
+    }
+    
+    if (moduleOptions.caching?.enabled) {
+      optionalImports.push({
+        name: 'useAICache',
+        from: resolver.resolve('./runtime/composables/useAICache')
+      })
+    }
+    
+    if (moduleOptions.vectorStore) {
+      optionalImports.push({
+        name: 'useAIVectorStore',
+        from: resolver.resolve('./runtime/composables/useAIVectorStore')
+      })
+      
+      optionalImports.push({
+        name: 'useAIRAG',
+        from: resolver.resolve('./runtime/composables/useAIRAG')
+      })
+    }
+    
+    // Always add store composables
+    optionalImports.push(
       {
         name: 'useAIStore',
         from: resolver.resolve('./runtime/composables/useAIStore')
@@ -232,12 +301,18 @@ export default defineNuxtModule<AINuxtModuleOptions>({
       {
         name: 'useAIChatStore',
         from: resolver.resolve('./runtime/composables/useAIChatStore')
-      },
-      {
-        name: 'useAICache',
-        from: resolver.resolve('./runtime/composables/useAICache')
       }
-    ])
+    )
+    
+    // Add performance monitoring in development or when debug is enabled
+    if (nuxt.options.dev || moduleOptions.debug) {
+      optionalImports.push({
+        name: 'useAIPerformance',
+        from: resolver.resolve('./runtime/composables/useAIPerformance')
+      })
+    }
+    
+    addImports([...coreImports, ...optionalImports])
     
     // Add types template
     addTemplate({

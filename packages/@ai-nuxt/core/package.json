@@ -13,6 +13,66 @@
       "import": "./dist/providers/index.mjs",
       "require": "./dist/providers/index.cjs",
       "types": "./dist/providers/index.d.ts"
+    },
+    "./providers/openai": {
+      "import": "./dist/providers/openai.mjs",
+      "require": "./dist/providers/openai.cjs",
+      "types": "./dist/providers/openai.d.ts"
+    },
+    "./providers/anthropic": {
+      "import": "./dist/providers/anthropic.mjs",
+      "require": "./dist/providers/anthropic.cjs",
+      "types": "./dist/providers/anthropic.d.ts"
+    },
+    "./providers/ollama": {
+      "import": "./dist/providers/ollama.mjs",
+      "require": "./dist/providers/ollama.cjs",
+      "types": "./dist/providers/ollama.d.ts"
+    },
+    "./providers/edge": {
+      "import": "./dist/providers/edge/index.mjs",
+      "require": "./dist/providers/edge/index.cjs",
+      "types": "./dist/providers/edge/index.d.ts"
+    },
+    "./cache": {
+      "import": "./dist/cache/index.mjs",
+      "require": "./dist/cache/index.cjs",
+      "types": "./dist/cache/index.d.ts"
+    },
+    "./vector-store": {
+      "import": "./dist/vector-store/index.mjs",
+      "require": "./dist/vector-store/index.cjs",
+      "types": "./dist/vector-store/index.d.ts"
+    },
+    "./agents": {
+      "import": "./dist/agents/index.mjs",
+      "require": "./dist/agents/index.cjs",
+      "types": "./dist/agents/index.d.ts"
+    },
+    "./monitoring": {
+      "import": "./dist/monitoring/index.mjs",
+      "require": "./dist/monitoring/index.cjs",
+      "types": "./dist/monitoring/index.d.ts"
+    },
+    "./security": {
+      "import": "./dist/security/index.mjs",
+      "require": "./dist/security/index.cjs",
+      "types": "./dist/security/index.d.ts"
+    },
+    "./compliance": {
+      "import": "./dist/compliance/index.mjs",
+      "require": "./dist/compliance/index.cjs",
+      "types": "./dist/compliance/index.d.ts"
+    },
+    "./testing": {
+      "import": "./dist/testing/index.mjs",
+      "require": "./dist/testing/index.cjs",
+      "types": "./dist/testing/index.d.ts"
+    },
+    "./performance": {
+      "import": "./dist/performance/index.mjs",
+      "require": "./dist/performance/index.cjs",
+      "types": "./dist/performance/index.d.ts"
     }
   },
   "main": "./dist/index.cjs",
@@ -31,7 +91,15 @@
   "dependencies": {
     "ofetch": "^1.3.3",
     "defu": "^6.1.4",
-    "consola": "^3.2.3"
+    "consola": "^3.2.3",
+    "@opentelemetry/api": "^1.7.0",
+    "@opentelemetry/sdk-node": "^0.45.0",
+    "@opentelemetry/resources": "^1.18.0",
+    "@opentelemetry/semantic-conventions": "^1.18.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.40.0",
+    "@opentelemetry/sdk-metrics": "^1.18.0",
+    "@opentelemetry/exporter-otlp-http": "^0.45.0",
+    "@opentelemetry/sdk-trace-node": "^1.18.0"
   },
   "devDependencies": {
     "typescript": "^5.3.0",
